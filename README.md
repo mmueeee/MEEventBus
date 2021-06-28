@@ -1,6 +1,15 @@
 # MEEventBus
 EventBus 基于协议的事件总线
 
+## 组件集成
+
+```ruby
+
+# Podfile
+pod 'MEEventBus', :git => 'https://github.com/mmueeee/MEEventBus.git', :branch => 'main'
+
+```
+
 ## 使用
 
 > 定义事件
@@ -54,6 +63,7 @@ EventBus 基于协议的事件总线
     [MEEventPublisher(MEEventSubscriberHandle) didUpdate:self data:data];
 }
 
+@end
 ```
 
 ## 功能计划
