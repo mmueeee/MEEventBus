@@ -14,8 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 取消订阅
 #define MEEventUnSubscriber(P, OBS) [MEEventBus.shared unsubscriberWithProtocol:@protocol(P) observer:OBS]
-// 取消一个订阅者的所有消息, 一般是订阅者销毁时
+
+// 取消一个订阅者的所有消息, 一般是订阅者即将销毁时
 #define MEEventUnSubscriberAll(OBS) [MEEventBus.shared unsubscriberWithObserver:OBS]
+#define MEEventUnSubscriberHandle(OBS) [MEEventBus.shared unsubscriberWithObserver:OBS]
 
 // 事件发布
 #define MEEventPublisher(P) ((id<P>)__protocol_dispatcher_forwarder(@protocol(P)))
@@ -41,6 +43,9 @@ id __protocol_dispatcher_forwarder(Protocol *p);
  使用协议替换NSNotificationCenter的字符串
  遵循协议订阅和发布消息, 业务中使用清晰参数清晰, 减少数据转换逻辑
  
+ #注意: 只有MEEventSubscriberHandle.isStrong 为true时, unsubscriber才是必须调用的
+ 但是业务端也应保持自律, 显示的调用取消订阅
+ 
  */
 @interface MEEventBus : NSObject
 
@@ -49,13 +54,16 @@ id __protocol_dispatcher_forwarder(Protocol *p);
 
 + (instancetype)shared;
 
+// 添加订阅, 重复添加不生效, 如果相同的协议和相同的实例重复调用此方法, 会返回上一次的Handle
 - (id<MEEventSubscriberHandle>)subscriberWithProtocol:(Protocol *)protocol
                                              observer:(id)observer;
 
+// 取消订阅
 - (void)unsubscriberWithProtocol:(Protocol *)protocol
                         observer:(id)observer;
 
-- (void)unsubscriberWithObserver:(id)observer;
+// 取消订阅, 可传入添加订阅时得到的Handle或者订阅者实例
+- (void)unsubscriberWithObserver:(id)observerOrHandle;
 
 @end
 

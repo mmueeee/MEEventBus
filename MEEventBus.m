@@ -82,7 +82,8 @@
     /// 检查
     _MEEventSubscriberHandleImpl *handle;
     for (_MEEventSubscriberHandleImpl *object in obsHandle) {
-        if (object.value == observer) {
+        /// 此处兼容传入的 observer 可以是一个_MEEventSubscriberHandleImpl实例
+        if (object.value == observer || observer == object) {
             handle = object;
             break;
         }
@@ -95,12 +96,16 @@
 
 - (void)unsubscriberWithObserver:(id)observer
 {
+    if (!observer) {
+        return;
+    }
     [lock lock];
     
     for (NSMutableArray *obsHandle in subscriberMapping.allValues) {
         _MEEventSubscriberHandleImpl *handle;
         for (_MEEventSubscriberHandleImpl *object in obsHandle) {
-            if (object.value == observer) {
+            /// 此处兼容传入的 observer 可以是一个_MEEventSubscriberHandleImpl实例
+            if (object.value == observer || observer == object) {
                 handle = object;
                 break;
             }
@@ -199,7 +204,8 @@
 @implementation MEEventBusDispatcherForwarder
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
-    struct objc_method_description method = protocol_getMethodDescription(self->__protocol__, aSelector, NO, YES);
+    struct objc_method_description method;
+    method = protocol_getMethodDescription(self->__protocol__, aSelector, NO, YES);
     if (method.types == nil) {
         method = protocol_getMethodDescription(self->__protocol__, aSelector, YES, YES);
     }
